@@ -6,7 +6,8 @@ import os
 import pandas as pd
 import wget
 
-def runcmd(cmd, verbose = True, *args, **kwargs):
+
+def runcmd(cmd, verbose=True, *args, **kwargs):
 
     process = subprocess.Popen(
         cmd,
@@ -20,6 +21,7 @@ def runcmd(cmd, verbose = True, *args, **kwargs):
         print(std_out.strip(), std_err)
     pass
 
+
 def download_file(url, filename):
     """
     Run a wget command to download a file from an HTTP or FTP server
@@ -29,6 +31,7 @@ def download_file(url, filename):
     """
     wget.download(url, out=f"{filename}.ubc")
     # runcmd(f'wget -O {filename}.ubc {url}')
+
 
 def get_datafiles(datapath='data'):
     """
@@ -46,8 +49,9 @@ def get_datafiles(datapath='data'):
                 download_file(row[1], f'{datapath}/{row[0]}')
 
             # Convert to tiff and invert pore and solid labels
-            img = np.fromfile(f"{datapath}/{row[0]}.ubc", dtype=np.uint8).reshape((512, 512, 512))
-            img = -1 * img + 1
+            img = np.fromfile(
+                f"{datapath}/{row[0]}.ubc", dtype=np.uint8).reshape((512, 512, 512))
+            img = (img == 0).astype(np.uint8)
             tifffile.imwrite(f"{datapath}/{row[0]}.tif", img.astype(np.uint8))
 
             # Remove the ubc file. Only keep the tiff file
@@ -79,7 +83,8 @@ def create_results_directory(directory_path: str = '.'):
     :return: None
     """
     # Create a parent results directory if it does not already exist at the specified path
-    os.makedirs(os.path.join(directory_path, 'image_characterization_results'), exist_ok=True)
+    os.makedirs(os.path.join(directory_path,
+                'image_characterization_results'), exist_ok=True)
 
 
 def write_results(results_df: pd.DataFrame, results_type: str,  directory_path: str = '.', filetype: str = 'csv', **kwargs) -> None:
@@ -109,7 +114,8 @@ def write_results(results_df: pd.DataFrame, results_type: str,  directory_path: 
     # First create the results directory structure
     create_results_directory(directory_path)
 
-    path_tmp = os.path.join(directory_path, "image_characterization_results", f"{results_type}.{filetype}")
+    path_tmp = os.path.join(directory_path, "image_characterization_results", f"{
+                            results_type}.{filetype}")
     # Check if the results file already exists
     # TODO: Should we use actual append functions? Should we rethink our algorithm for writing these files?
     if os.path.exists(path_tmp):
@@ -118,7 +124,8 @@ def write_results(results_df: pd.DataFrame, results_type: str,  directory_path: 
         # Concatenate the results dataframe with the existing dataframe
         results_df = pd.concat([df_tmp, results_df.copy()], ignore_index=True)
         # Drop any rows with duplicated data names. keep only the last occurrence (assuming to be most recently added)
-        results_df = results_df.drop_duplicates(subset=['Name'], keep='last', ignore_index=True)
+        results_df = results_df.drop_duplicates(
+            subset=['Name'], keep='last', ignore_index=True)
 
     filetype_write_dict = {'parquet': results_df.to_parquet,
                            'csv': results_df.to_csv,
@@ -127,4 +134,3 @@ def write_results(results_df: pd.DataFrame, results_type: str,  directory_path: 
                            'json': results_df.to_json}
     # Write the results to a file
     filetype_write_dict[filetype](path_tmp, **kwargs)
-
