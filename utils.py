@@ -114,8 +114,7 @@ def write_results(results_df: pd.DataFrame, results_type: str,  directory_path: 
     # First create the results directory structure
     create_results_directory(directory_path)
 
-    path_tmp = os.path.join(directory_path, "image_characterization_results", f"{
-                            results_type}.{filetype}")
+    path_tmp = os.path.join(directory_path, "image_characterization_results", f"{results_type}.{filetype}")
     # Check if the results file already exists
     # TODO: Should we use actual append functions? Should we rethink our algorithm for writing these files?
     if os.path.exists(path_tmp):
