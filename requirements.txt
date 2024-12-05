@@ -1,8 +1,7 @@
 numpy
 matplotlib
 pyvista[all]
-#"dpm_tools[segment]",
+dpm_tools
 porespy
 scikit-image
 trimesh
-wget
