@@ -5,3 +5,4 @@ dpm_tools
 porespy
 scikit-image
 trimesh
+MedPy
